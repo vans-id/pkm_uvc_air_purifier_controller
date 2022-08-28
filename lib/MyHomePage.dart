@@ -12,32 +12,23 @@ import 'Power.dart';
 import 'shared.dart';
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key key}) : super(key: key);
+  final Socket channel;
+
+  const MyHomePage({Key key, this.channel}) : super(key: key);
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  Socket channel;
   bool _isPowerActive = false;
   bool _isUVCActive = false;
   bool _isPurifierActive = false;
 
   @override
-  void initState() {
-    _connectSocket();
-    super.initState();
-  }
-
-  @override
   void dispose() {
-    // channel.close();
+    widget.channel.close();
     super.dispose();
-  }
-
-  void _connectSocket() async {
-    // channel = await Socket.connect('192.168.1.104', 80);
   }
 
   void _showSnackBar(String msg) {
@@ -56,24 +47,46 @@ class _MyHomePageState extends State<MyHomePage> {
       }
       _isUVCActive = !_isUVCActive;
 
-      var message = _isUVCActive ? "UVC sudah menyala" : "UVC sudah dimatikan";
+      String message;
+      int value;
+
+      if (!_isUVCActive) {
+        message = "UVC sudah dimatikan";
+        value = 6;
+      } else {
+        message = "UVC sudah menyala";
+        value = 5;
+      }
+
+      // var message = _isUVCActive ? "UVC sudah menyala" : "UVC sudah dimatikan";
       _showSnackBar(message);
-      // channel.write(Feature.UVC.name);
+      widget.channel.write(value);
+      widget.channel.write("\n");
     });
   }
 
   void onPowerTap() {
     setState(() {
       _isPowerActive = !_isPowerActive;
+
+      String message;
+      int value;
+
       if (!_isPowerActive) {
         _isUVCActive = false;
         _isPurifierActive = false;
+        message = "Alat sudah dimatikan";
+        value = 0;
+      } else {
+        message = "Alat sudah menyala";
+        value = 9;
       }
 
-      var message =
-          _isPowerActive ? "Alat sudah menyala" : "Alat sudah dimatikan";
+      // String message =
+      //     _isPowerActive ? "Alat sudah menyala" : "Alat sudah dimatikan";
       _showSnackBar(message);
-      // channel.write(Feature.POWER.name);
+      widget.channel.write(value);
+      widget.channel.write("\n");
     });
   }
 
@@ -84,11 +97,28 @@ class _MyHomePageState extends State<MyHomePage> {
         return;
       }
       _isPurifierActive = !_isPurifierActive;
-      var message = _isPurifierActive
-          ? "Air Purifier sudah menyala"
-          : "Air Purifier sudah dimatikan";
+
+      String message;
+      int value;
+
+      if (!_isPurifierActive) {
+        message = "Air Purifier sudah dimatikan";
+        value = 8;
+      } else {
+        message = "Air Purifier sudah menyala";
+        value = 7;
+      }
+
+      // String message =
+      //     _isPowerActive ? "Alat sudah menyala" : "Alat sudah dimatikan";
       _showSnackBar(message);
-      // channel.write(Feature.AIR.name);
+      widget.channel.write(value);
+      widget.channel.write("\n");
+      // var message = _isPurifierActive
+      //     ? "Air Purifier sudah menyala"
+      //     : "Air Purifier sudah dimatikan";
+      // _showSnackBar(message);
+      // widget.channel.write(Feature.AIR.name);
     });
   }
 
@@ -101,19 +131,27 @@ class _MyHomePageState extends State<MyHomePage> {
     switch (key) {
       case Direction.LEFT:
         _showSnackBar("${Direction.LEFT.name}");
-        // channel.write(Feature.LEFT.name);
+        // widget.channel.write(Direction.LEFT.name);
+        widget.channel.write(4);
+        widget.channel.write("\n");
         break;
       case Direction.RIGHT:
         _showSnackBar("${Direction.RIGHT.name}");
-        // channel.write(Feature.RIGHT.name);
+        // widget.channel.write(Direction.RIGHT.name);
+        widget.channel.write(3);
+        widget.channel.write("\n");
         break;
       case Direction.UP:
         _showSnackBar("${Direction.UP.name}");
-        // channel.write(Feature.UP.name);
+        // widget.channel.write(Direction.UP.name);
+        widget.channel.write(1);
+        widget.channel.write("\n");
         break;
       case Direction.DOWN:
         _showSnackBar("${Direction.DOWN.name}");
-        // channel.write(Feature.DOWN.name);
+        // widget.channel.write(Direction.DOWN.name);
+        widget.channel.write(2);
+        widget.channel.write("\n");
         break;
       default:
         _showSnackBar("Arah tidak diketahui");
